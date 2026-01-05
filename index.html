@@ -32,11 +32,11 @@
   <div class="screen" id="display">
     <div class="system-msg" id="status">INITIALIZING SYSTEM...</div>
     <div class="loading-box"><div class="loading-bar" id="bar"></div></div>
-    <div id="sub-msg">正在掃描自然人憑證及指紋識別中...</div>
+    <div id="sub-msg">正在啟動身分識別系統...</div>
   </div>
 
   <script>
-    // 1. 矩陣背景 (保持你原本的字雨效果)
+    // 1. 矩陣背景
     const canvas = document.getElementById("matrix");
     const ctx = canvas.getContext("2d");
     canvas.width = window.innerWidth; canvas.height = window.innerHeight;
@@ -62,11 +62,25 @@
     const bar = document.getElementById("bar");
     const display = document.getElementById("display");
 
+    // 判斷是否為手機端
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
     let progress = 0;
     const interval = setInterval(() => {
       progress += Math.random() * 4;
       if (progress > 100) progress = 100;
       bar.style.width = progress + "%";
+
+      // 根據進度條動態更新識別文字 (花裡胡哨的關鍵)
+      if (progress > 10 && progress < 90) {
+          if (isMobile) {
+              subMsg.innerHTML = "正在掃描 <span style='color:#fff'>人臉</span> 及 <span style='color:#fff'>指紋</span> 識別中...";
+          } else {
+              subMsg.innerHTML = "正在掃描 <span style='color:#fff'>自然人憑證</span> 及 <span style='color:#fff'>指紋</span> 識別中...";
+          }
+      } else if (progress >= 90 && progress < 100) {
+          subMsg.innerText = "權限核可中，請稍候...";
+      }
 
       if (progress === 100) {
         clearInterval(interval);
@@ -79,7 +93,6 @@
       status.innerText = "【 驗 證 成 功 】";
       subMsg.innerHTML = "<span class='typing'>長官好，歡迎您回歸。系統權限已全面解鎖。</span>";
       
-      // 延遲一下顯示按鈕，更有劇情感
       setTimeout(() => {
         const btns = document.createElement("div");
         btns.className = "btn-group";
