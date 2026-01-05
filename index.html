@@ -1,34 +1,84 @@
-<script>
-    // ... 前面的 draw 字雨效果代碼保持不變 ...
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>社畜系統入口</title>
+  <style>
+    html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; font-family: monospace; color: #0f0; }
+    canvas { position: fixed; top: 0; left: 0; z-index: -1; }
+    .center-screen { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 80%; }
+    .progress { width: 100%; max-width: 400px; margin: 20px auto; background: rgba(0, 255, 0, 0.1); border: 1px solid #0f0; height: 15px; border-radius: 5px; overflow: hidden; }
+    .bar { height: 100%; width: 0%; background: #0f0; transition: width 0.1s; }
+    .btn-group { display: none; margin-top: 20px; }
+    button { background: black; color: #0f0; border: 1px solid #0f0; padding: 10px 20px; font-size: 1.1em; cursor: pointer; margin: 10px; font-family: inherit; }
+    button:hover { background: #0f0; color: black; }
+  </style>
+</head>
+<body>
+  <canvas id="matrix"></canvas>
+  <div class="center-screen" id="main-content">
+    <h1 id="title">存取社畜神器系統中...</h1>
+    <p id="status">身分驗證中<span id="dots"></span></p>
+    <button id="startBtn">啟動系統連結</button>
+  </div>
 
-    // 點擊登入後的邏輯修改
-    document.getElementById("loginBtn").addEventListener("click", () => {
-      const loginDiv = document.getElementById("login");
-      loginDiv.innerHTML = `
-        <h1>✅ 身分驗證成功</h1>
+  <script>
+    // --- Matrix 字雨效果 ---
+    const canvas = document.getElementById("matrix");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const letters = "魃魈魁魑魅魍魎0101".split("");
+    const fontSize = 16;
+    const columns = canvas.width / fontSize;
+    const drops = Array(Math.floor(columns)).fill(1);
+    function draw() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#0f0";
+      ctx.font = fontSize + "px monospace";
+      drops.forEach((y, i) => {
+        const text = letters[Math.floor(Math.random() * letters.length)];
+        ctx.fillText(text, i * fontSize, y * fontSize);
+        if (y * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+        drops[i]++;
+      });
+    }
+    setInterval(draw, 50);
+
+    // --- 進度條與選單邏輯 ---
+    const startBtn = document.getElementById("startBtn");
+    const content = document.getElementById("main-content");
+
+    startBtn.onclick = () => {
+      content.innerHTML = `
+        <h1>✅ 權限已核可</h1>
         <div class="progress"><div class="bar" id="bar"></div></div>
-        <p id="status-text">正在加載系統模組……</p>
-        <div id="menu-options" style="display:none; margin-top: 20px;">
-           <button onclick="location.href='index.html'" style="margin-right:10px;">進入下班計算器</button>
-           <button onclick="location.href='leave.html'">進入請假神器</button>
+        <p id="progress-text">正在加載工具模組: 0%</p>
+        <div class="btn-group" id="btns">
+           <button onclick="location.href='calc.html'">⏱️ 下班計算器</button>
+           <button onclick="location.href='leave.html'">🏖️ 請假神器</button>
         </div>
       `;
-
-      let progress = 0;
+      
+      let prog = 0;
       const bar = document.getElementById("bar");
-      const statusText = document.getElementById("status-text");
-      const menuOptions = document.getElementById("menu-options");
+      const txt = document.getElementById("progress-text");
+      const btns = document.getElementById("btns");
       
       const timer = setInterval(() => {
-        progress += Math.random() * 8; // 隨機增加進度
-        bar.style.width = Math.min(progress, 100) + "%";
-
-        if (progress >= 100) {
+        prog += Math.random() * 5;
+        bar.style.width = Math.min(prog, 100) + "%";
+        txt.innerText = `正在加載工具模組: ${Math.floor(Math.min(prog, 100))}%`;
+        
+        if (prog >= 100) {
           clearInterval(timer);
-          statusText.innerText = "── 系統權限已解鎖，請選擇模組 ──";
-          // 進度條跑完後，顯示選項按鈕
-          menuOptions.style.display = "block";
+          txt.innerText = "── 請選擇要啟動的神器 ──";
+          btns.style.display = "block";
         }
-      }, 80);
-    });
-</script>
+      }, 50);
+    };
+  </script>
+</body>
+</html>
