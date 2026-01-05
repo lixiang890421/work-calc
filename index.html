@@ -1,0 +1,34 @@
+<script>
+    // ... 前面的 draw 字雨效果代碼保持不變 ...
+
+    // 點擊登入後的邏輯修改
+    document.getElementById("loginBtn").addEventListener("click", () => {
+      const loginDiv = document.getElementById("login");
+      loginDiv.innerHTML = `
+        <h1>✅ 身分驗證成功</h1>
+        <div class="progress"><div class="bar" id="bar"></div></div>
+        <p id="status-text">正在加載系統模組……</p>
+        <div id="menu-options" style="display:none; margin-top: 20px;">
+           <button onclick="location.href='index.html'" style="margin-right:10px;">進入下班計算器</button>
+           <button onclick="location.href='leave.html'">進入請假神器</button>
+        </div>
+      `;
+
+      let progress = 0;
+      const bar = document.getElementById("bar");
+      const statusText = document.getElementById("status-text");
+      const menuOptions = document.getElementById("menu-options");
+      
+      const timer = setInterval(() => {
+        progress += Math.random() * 8; // 隨機增加進度
+        bar.style.width = Math.min(progress, 100) + "%";
+
+        if (progress >= 100) {
+          clearInterval(timer);
+          statusText.innerText = "── 系統權限已解鎖，請選擇模組 ──";
+          // 進度條跑完後，顯示選項按鈕
+          menuOptions.style.display = "block";
+        }
+      }, 80);
+    });
+</script>
