@@ -1,74 +1,185 @@
+
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <title>社畜請假計算神器</title>
+  <title>請假神器</title>
   <style>
-    body { font-family: 'Noto Sans TC', sans-serif; background: #f5f5f5; padding: 2em; }
-    .container { max-width: 600px; margin: auto; background: white; padding: 2em; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    h1 { color: #444; }
-    input, button { padding: 0.5em; margin: 0.5em 0; font-size: 1em; }
-    #result { margin-top: 1em; font-weight: bold; }
+    body {
+      font-family: "標楷體", "DFKai-SB", serif;
+      background: #f0f0f0;
+      text-align: center;
+      padding: 2em;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 2em;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.1);
+    }
+
+    .stamp {
+      display: inline-block;
+      border: 2px solid #e57373;
+      color: #e57373;
+      padding: 0.3em 1em;
+      font-size: 1.4rem;
+      font-weight: bold;
+      border-radius: 0.5rem;
+      background: #fff5f5;
+      margin-bottom: 1.2rem;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 0.5em;
+    }
+
+    select, input, button {
+      padding: 0.5em;
+      font-size: 1em;
+      margin: 0.5em 0;
+    }
+
+    #result, #clock, #countdown, #liveCountdown {
+      margin-top: 1em;
+      font-weight: bold;
+      font-size: 1.1em;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <p><a href="index.html" style="color: #444; text-decoration: none;">🏠 回到下班計算器</a></p>
-    <h1>社畜請假計算神器 ⛱️</h1>
-    <label for="checkin">上班時間：</label><br>
-    <input type="time" id="checkin" required><br>
+    <div class="stamp">請假請起來</div>
 
-    <label for="leaveHours">請假幾小時？</label><br>
-    <input type="number" id="leaveHours" min="0" max="8" step="0.5" required> 小時<br>
+    <h1>請假神器</h1>
 
-    <button onclick="calculateAdjustedLeaveTime()">算我幾點能下班</button>
+    <div id="clock">目前時間：--:--:--</div>
+    <div id="countdown">剩餘時間：--</div>
+
+    <label for="checkin">上班時間（限 07:30~08:30）：</label><br>
+    <select id="checkin"></select><br>
+
+    <label for="leaveHours">請假幾小時？（整數）</label><br>
+    <select id="leaveHours"></select><br>
+
+    <button onclick="calculateLeaveTime()">幾點可以下班？</button>
+
     <div id="result"></div>
+    <div id="liveCountdown"></div>
   </div>
 
   <script>
-    function parseTimeToMinutes(timeStr) {
-      const [hour, minute] = timeStr.split(":").map(Number);
-      return hour * 60 + minute;
+    const checkinSelect = document.getElementById("checkin");
+    for (let h = 7; h <= 8; h++) {
+      for (let m = 0; m < 60; m++) {
+        if ((h === 7 && m < 30) || (h === 8 && m > 30)) continue;
+        const val = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+        const option = document.createElement("option");
+        option.value = val;
+        option.text = val;
+        if (val === "07:30") option.selected = true;
+        checkinSelect.appendChild(option);
+      }
     }
 
-    function minutesToTimeStr(minutes) {
-      const hour = Math.floor(minutes / 60);
-      const min = minutes % 60;
-      return `${String(hour).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
+    const leaveSelect = document.getElementById("leaveHours");
+    for (let i = 0; i <= 8; i++) {
+      const opt = document.createElement("option");
+      opt.value = i;
+      opt.text = `${i} 小時`;
+      leaveSelect.appendChild(opt);
     }
 
-    function calculateAdjustedLeaveTime() {
-      const checkinInput = document.getElementById("checkin").value;
-      const leaveHoursInput = parseFloat(document.getElementById("leaveHours").value);
+    function parseTimeToMinutes(str) {
+      const [h, m] = str.split(":").map(Number);
+      return h * 60 + m;
+    }
 
-      if (!checkinInput || isNaN(leaveHoursInput)) {
-        document.getElementById("result").innerText = "請正確填寫上班時間與請假時數！";
+    function minutesToTimeStr(mins) {
+      const h = Math.floor(mins / 60);
+      const m = mins % 60;
+      return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+    }
+
+    function updateClock() {
+      const now = new Date();
+      const hh = String(now.getHours()).padStart(2, "0");
+      const mm = String(now.getMinutes()).padStart(2, "0");
+      const ss = String(now.getSeconds()).padStart(2, "0");
+      document.getElementById("clock").innerText = `目前時間：${hh}:${mm}:${ss}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    let countdownTimer;
+
+    function calculateLeaveTime() {
+      clearInterval(countdownTimer);
+
+      const checkinStr = document.getElementById("checkin").value;
+      const leaveHours = parseInt(document.getElementById("leaveHours").value);
+      const resultDiv = document.getElementById("result");
+      const countdownDiv = document.getElementById("countdown");
+      const liveCountdown = document.getElementById("liveCountdown");
+
+      if (!checkinStr || isNaN(leaveHours)) {
+        resultDiv.innerText = "請正確輸入上班時間與請假時數（整數）";
+        countdownDiv.innerText = "";
+        liveCountdown.innerText = "";
         return;
       }
 
-      const checkin = parseTimeToMinutes(checkinInput);
+      const checkin = parseTimeToMinutes(checkinStr);
+      const requiredWork = 480 - (leaveHours * 60);
       const lunchStart = parseTimeToMinutes("12:00");
       const lunchEnd = parseTimeToMinutes("13:30");
-
-      const requiredWork = 480 - (leaveHoursInput * 60); // 8小時 - 請假時間
 
       let worked = 0;
       let current = checkin;
 
       while (worked < requiredWork) {
-        // 判斷是否遇到午休，要跳過
-        if (current === lunchStart) {
+        if (current >= lunchStart && current < lunchEnd) {
           current = lunchEnd;
         } else {
-          worked++;
           current++;
+          worked++;
         }
       }
 
-      const resultTime = minutesToTimeStr(current);
-      document.getElementById("result").innerHTML =
-        `🧮 你請假了 ${leaveHoursInput} 小時，只需上班 ${requiredWork} 分鐘<br>` +
-        `✅ <strong>最早可下班時間：${resultTime}</strong>`;
+      const leaveTime = minutesToTimeStr(current);
+      resultDiv.innerHTML =
+        `🧮 你請了 <strong>${leaveHours} 小時</strong>，需工作 <strong>${requiredWork} 分鐘</strong><br>` +
+        `✅ 最早可合法下班時間為：<strong>${leaveTime}</strong>`;
+
+      const now = new Date();
+      const nowMin = now.getHours() * 60 + now.getMinutes();
+      const diff = current - nowMin;
+
+      countdownDiv.innerText =
+        diff > 0
+          ? `⌛ 賣造!還剩 ${diff} 分鐘才可合法下班`
+          : `🎉 現在可下班，塊陶啊社畜戰士！`;
+
+      function updateLiveCountdown() {
+        const now = new Date();
+        const nowSeconds = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+        const targetSeconds = Math.floor(current * 60);
+        let remain = targetSeconds - nowSeconds;
+        if (remain < 0) remain = 0;
+
+        const h = Math.floor(remain / 3600);
+        const m = Math.floor((remain % 3600) / 60);
+        const s = remain % 60;
+
+        liveCountdown.innerText = `⏳ 倒數：${String(h).padStart(2, '0')} 小時 ${String(m).padStart(2, '0')} 分 ${String(s).padStart(2, '0')} 秒`;
+      }
+
+      updateLiveCountdown();
+      countdownTimer = setInterval(updateLiveCountdown, 1000);
     }
   </script>
 </body>
