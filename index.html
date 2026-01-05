@@ -10,12 +10,10 @@
     
     .screen { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; }
     
-    /* 打字機效果文字 */
     .typing { border-right: 2px solid #0f0; white-space: nowrap; overflow: hidden; display: inline-block; }
     
     .system-msg { font-size: 1.5rem; letter-spacing: 5px; text-shadow: 0 0 10px #0f0; margin-bottom: 20px; }
     
-    /* 進度條樣式 */
     .loading-box { width: 300px; height: 4px; background: rgba(0,255,0,0.2); margin: 20px auto; position: relative; }
     .loading-bar { width: 0%; height: 100%; background: #0f0; box-shadow: 0 0 15px #0f0; transition: width 0.1s; }
     
@@ -62,7 +60,6 @@
     const bar = document.getElementById("bar");
     const display = document.getElementById("display");
 
-    // 判斷是否為手機端
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
     let progress = 0;
@@ -71,18 +68,14 @@
       if (progress > 100) progress = 100;
       bar.style.width = progress + "%";
 
-      // 根據進度條動態更新識別文字 (花裡胡哨的關鍵)
-      // 根據進度條動態更新識別文字
-if (progress > 10 && progress < 90) {
-    if (isMobile) {
-        // 手機版：人臉(亮粉色)、指紋(白色)
-        subMsg.innerHTML = "正在掃描 <span style='color:#FF69B4; text-shadow: 0 0 5px #FF69B4;'>人臉</span> 及 <span style='color:#fff'>指紋</span> 識別中...";
-    } else {
-        // 電腦版：自然人憑證(天空藍)、電腦ID(白色)
-        subMsg.innerHTML = "正在掃描 <span style='color:#00BFFF; text-shadow: 0 0 5px #00BFFF;'>自然人憑證</span> 及 <span style='color:#fff'>電腦ID</span> 識別中...";
-    }
+      if (progress > 10 && progress < 90) {
+        if (isMobile) {
+          subMsg.innerHTML = "正在掃描 <span style='color:#FF69B4; text-shadow: 0 0 5px #FF69B4;'>人臉</span> 及 <span style='color:#FFD700'>指紋</span> 識別中...";
+        } else {
+          subMsg.innerHTML = "正在掃描 <span style='color:#00BFFF; text-shadow: 0 0 5px #00BFFF;'>自然人憑證</span> 及 <span style='color:#FF3030'>電腦ID</span> 識別中...";
+        }
       } else if (progress >= 90 && progress < 100) {
-          subMsg.innerText = "權限核可中，請稍候...";
+        subMsg.innerText = "權限核可中，請稍候...";
       }
 
       if (progress === 100) {
@@ -110,5 +103,3 @@ if (progress > 10 && progress < 90) {
   </script>
 </body>
 </html>
-
-
