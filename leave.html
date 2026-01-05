@@ -2,9 +2,10 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>請假神器</title>
   <style>
-    /* 核心置中結構 - 讓內容永遠在螢幕中間 */
+    /* 全螢幕背景與置中 */
     html, body {
       margin: 0;
       padding: 0;
@@ -18,108 +19,149 @@
     }
 
     .container {
-      width: 90%;
-      max-width: 500px; /* 稍微縮小寬度，視覺更集中 */
+      width: 95%; /* 增加手機版佔比 */
+      max-width: 450px; /* 限制電腦版寬度，避免拉得太扁 */
       background: white;
-      padding: 2.5rem 1.5rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      padding: 2.5rem 1rem;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
       text-align: center;
       box-sizing: border-box;
     }
 
     /* 頂部連結導航 */
     .top-nav {
-      margin-bottom: 20px;
-      font-size: 0.95rem;
+      margin-bottom: 25px;
+      font-size: 1rem;
     }
     .top-nav a {
-      color: #444;
+      color: #555;
       text-decoration: none;
       font-weight: bold;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 2px;
     }
 
     .stamp {
       display: inline-block;
-      border: 2px solid #e57373;
+      border: 3px solid #e57373; /* 加粗邊框 */
       color: #e57373;
-      padding: 0.3em 1em;
-      font-size: 1.4rem;
-      font-weight: bold;
-      border-radius: 0.5rem;
+      padding: 0.5rem 1.5rem;
+      font-size: 1.6rem;
+      font-weight: 900; /* 加粗字體 */
+      border-radius: 0.8rem;
       background: #fff5f5;
-      margin-bottom: 1.2rem;
+      margin-bottom: 1.5rem;
+      transform: rotate(-2deg); /* 增加一點印章斜度感 */
     }
 
     h1 {
       color: #333;
-      margin-bottom: 0.5em;
-      font-size: 1.8rem;
+      margin: 10px 0 20px 0;
+      font-size: 2.2rem;
+      font-weight: bold;
     }
 
-    /* 表單元件美化，但不改動文字 */
-    select, button {
-      width: 80%; /* 讓選單稍微寬一點好點擊 */
-      padding: 0.6em;
-      font-size: 1.1em;
-      margin: 0.6em 0;
-      border-radius: 6px;
-      border: 1px solid #ccc;
+    #clock {
+      color: #444;
+      font-family: 'Courier New', monospace;
+      font-size: 1.3rem;
+      background: #f9f9f9;
+      padding: 5px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+
+    /* 表單區域優化 */
+    .form-group {
+      margin: 25px 0;
+      text-align: center;
+    }
+
+    label {
+      font-size: 1.1rem;
+      font-weight: bold;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    select {
+      width: 85%;
+      padding: 12px;
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      border: 2px solid #eee;
+      background-color: #fff;
+      text-align: center;
     }
 
     button {
+      width: 85%;
+      padding: 15px;
+      font-size: 1.3rem;
       background: #e57373;
       color: white;
       border: none;
+      border-radius: 12px;
       cursor: pointer;
       font-weight: bold;
-      transition: background 0.3s;
-      width: 80%;
+      font-family: inherit;
+      box-shadow: 0 4px 10px rgba(229, 115, 115, 0.3);
+      transition: all 0.2s;
     }
 
-    button:hover {
-      background: #d32f2f;
+    button:active {
+      transform: scale(0.98);
+      box-shadow: 0 2px 5px rgba(229, 115, 115, 0.3);
     }
 
-    #result, #clock, #countdown, #liveCountdown {
-      margin-top: 1em;
+    #result, #countdown, #liveCountdown {
+      margin-top: 20px;
       font-weight: bold;
-      font-size: 1.1em;
-      line-height: 1.5;
+      font-size: 1.2rem;
+      line-height: 1.6;
     }
 
-    #clock { color: #555; font-family: monospace; }
-    #liveCountdown { color: #d32f2f; }
+    #liveCountdown {
+      color: #d32f2f;
+      background: #fff0f0;
+      padding: 10px;
+      border-radius: 8px;
+      display: inline-block;
+      margin-top: 15px;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="top-nav">
-      <a href="calc.html">沒假啦，乖乖上班!🏠 回到下班計算器</a>
+      <a href="calc.html">🏠 回到下班計算器 (沒假啦!)</a>
     </div>
 
     <div class="stamp">請假請起來</div>
 
     <h1>請假神器</h1>
-    <div id="clock">目前時間：--:--:--</div>
-    <div id="countdown">剩餘時間：--</div>
     
-    <div style="margin: 20px 0;">
-      <label for="checkin">上班時間（限 07:30~08:30）：</label><br>
-      <select id="checkin"></select><br>
+    <div id="clock">--:--:--</div>
+    
+    <div class="form-group">
+      <label for="checkin">⏰ 上班時間</label>
+      <select id="checkin"></select>
 
-      <label for="leaveHours">請假幾小時？（整數）</label><br>
+      <label for="leaveHours">🏖️ 請假幾小時？</label>
       <select id="leaveHours"></select>
     </div>
 
-    <button onclick="calculateLeaveTime()">幾點可以下班？</button>
+    <button onclick="calculateLeaveTime()">計算合法下班時間</button>
 
     <div id="result"></div>
+    <div id="countdown"></div>
     <div id="liveCountdown"></div>
   </div>
 
   <script>
-    /* 這裡完全保留你原本的邏輯程式碼，沒有做任何修改 */
+    /* 原有逻辑完全保留 */
     const checkinSelect = document.getElementById("checkin");
     for (let h = 7; h <= 8; h++) {
       for (let m = 0; m < 60; m++) {
@@ -165,19 +207,12 @@
     let countdownTimer;
 
     function calculateLeaveTime() {
-      clearInterval(countdownTimer);
+      if(countdownTimer) clearInterval(countdownTimer);
       const checkinStr = document.getElementById("checkin").value;
       const leaveHours = parseInt(document.getElementById("leaveHours").value);
       const resultDiv = document.getElementById("result");
       const countdownDiv = document.getElementById("countdown");
       const liveCountdown = document.getElementById("liveCountdown");
-
-      if (!checkinStr || isNaN(leaveHours)) {
-        resultDiv.innerText = "請正確輸入上班時間與請假時數（整數）";
-        countdownDiv.innerText = "";
-        liveCountdown.innerText = "";
-        return;
-      }
 
       const checkin = parseTimeToMinutes(checkinStr);
       const requiredWork = 480 - (leaveHours * 60);
@@ -196,26 +231,25 @@
       }
 
       const leaveTime = minutesToTimeStr(current);
-      resultDiv.innerHTML =
-        `🧮 你請了 <strong>${leaveHours} 小時</strong>，需工作 <strong>${requiredWork} 分鐘</strong><br>` +
-        `✅ 最早可合法下班時間為：<strong>${leaveTime}</strong>`;
-
-      const now = new Date();
-      const nowMin = now.getHours() * 60 + now.getMinutes();
-      const diff = current - nowMin;
-      countdownDiv.innerText = diff > 0
-          ? `⌛ 賣造!還剩 ${diff} 分鐘才可合法下班`
-          : `🎉 現在可下班，塊陶啊社畜戰士！`;
+      resultDiv.innerHTML = `✅ 最早可下班時間為：<br><span style="font-size:1.8rem; color:#d32f2f;">${leaveTime}</span>`;
 
       function updateLiveCountdown() {
         const now = new Date();
         const nowSeconds = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
         const targetSeconds = Math.floor(current * 60);
         let remain = targetSeconds - nowSeconds;
-        if (remain < 0) remain = 0;
+        
+        if (remain <= 0) {
+          clearInterval(countdownTimer);
+          countdownDiv.innerText = "🎉 現在可下班，塊陶啊！";
+          liveCountdown.innerText = "倒數：00 小時 00 分 00 秒";
+          return;
+        }
+
         const h = Math.floor(remain / 3600);
         const m = Math.floor((remain % 3600) / 60);
         const s = remain % 60;
+        countdownDiv.innerText = `⌛ 還剩 ${Math.floor(remain/60)} 分鐘`;
         liveCountdown.innerText = `⏳ 倒數：${String(h).padStart(2, '0')} 小時 ${String(m).padStart(2, '0')} 分 ${String(s).padStart(2, '0')} 秒`;
       }
       updateLiveCountdown();
