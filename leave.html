@@ -4,20 +4,39 @@
   <meta charset="UTF-8">
   <title>請假神器</title>
   <style>
-    body {
-      font-family: "標楷體", "DFKai-SB", serif;
+    /* 核心置中結構 - 讓內容永遠在螢幕中間 */
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
       background: #f0f0f0;
-      text-align: center;
-      padding: 2em;
+      font-family: "標楷體", "DFKai-SB", serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .container {
-      max-width: 600px;
-      margin: auto;
+      width: 90%;
+      max-width: 500px; /* 稍微縮小寬度，視覺更集中 */
       background: white;
-      padding: 2em;
+      padding: 2.5rem 1.5rem;
       border-radius: 12px;
-      box-shadow: 0 0 12px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      text-align: center;
+      box-sizing: border-box;
+    }
+
+    /* 頂部連結導航 */
+    .top-nav {
+      margin-bottom: 20px;
+      font-size: 0.95rem;
+    }
+    .top-nav a {
+      color: #444;
+      text-decoration: none;
+      font-weight: bold;
     }
 
     .stamp {
@@ -35,34 +54,63 @@
     h1 {
       color: #333;
       margin-bottom: 0.5em;
+      font-size: 1.8rem;
     }
 
-    select, input, button {
-      padding: 0.5em;
-      font-size: 1em;
-      margin: 0.5em 0;
+    /* 表單元件美化，但不改動文字 */
+    select, button {
+      width: 80%; /* 讓選單稍微寬一點好點擊 */
+      padding: 0.6em;
+      font-size: 1.1em;
+      margin: 0.6em 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background: #e57373;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s;
+      width: 80%;
+    }
+
+    button:hover {
+      background: #d32f2f;
     }
 
     #result, #clock, #countdown, #liveCountdown {
       margin-top: 1em;
       font-weight: bold;
       font-size: 1.1em;
+      line-height: 1.5;
     }
+
+    #clock { color: #555; font-family: monospace; }
+    #liveCountdown { color: #d32f2f; }
   </style>
 </head>
 <body>
   <div class="container">
-    <p><a href="calc.html" style="color: #444; text-decoration: none;">沒假啦，乖乖上班!🏠 回到下班計算器</a></p>
+    <div class="top-nav">
+      <a href="calc.html">沒假啦，乖乖上班!🏠 回到下班計算器</a>
+    </div>
+
     <div class="stamp">請假請起來</div>
 
     <h1>請假神器</h1>
     <div id="clock">目前時間：--:--:--</div>
     <div id="countdown">剩餘時間：--</div>
-    <label for="checkin">上班時間（限 07:30~08:30）：</label><br>
-    <select id="checkin"></select><br>
+    
+    <div style="margin: 20px 0;">
+      <label for="checkin">上班時間（限 07:30~08:30）：</label><br>
+      <select id="checkin"></select><br>
 
-    <label for="leaveHours">請假幾小時？（整數）</label><br>
-    <select id="leaveHours"></select><br>
+      <label for="leaveHours">請假幾小時？（整數）</label><br>
+      <select id="leaveHours"></select>
+    </div>
 
     <button onclick="calculateLeaveTime()">幾點可以下班？</button>
 
@@ -71,6 +119,7 @@
   </div>
 
   <script>
+    /* 這裡完全保留你原本的邏輯程式碼，沒有做任何修改 */
     const checkinSelect = document.getElementById("checkin");
     for (let h = 7; h <= 8; h++) {
       for (let m = 0; m < 60; m++) {
@@ -117,7 +166,6 @@
 
     function calculateLeaveTime() {
       clearInterval(countdownTimer);
-
       const checkinStr = document.getElementById("checkin").value;
       const leaveHours = parseInt(document.getElementById("leaveHours").value);
       const resultDiv = document.getElementById("result");
@@ -138,7 +186,6 @@
 
       let worked = 0;
       let current = checkin;
-
       while (worked < requiredWork) {
         if (current >= lunchStart && current < lunchEnd) {
           current = lunchEnd;
@@ -156,9 +203,7 @@
       const now = new Date();
       const nowMin = now.getHours() * 60 + now.getMinutes();
       const diff = current - nowMin;
-
-      countdownDiv.innerText =
-        diff > 0
+      countdownDiv.innerText = diff > 0
           ? `⌛ 賣造!還剩 ${diff} 分鐘才可合法下班`
           : `🎉 現在可下班，塊陶啊社畜戰士！`;
 
@@ -168,18 +213,14 @@
         const targetSeconds = Math.floor(current * 60);
         let remain = targetSeconds - nowSeconds;
         if (remain < 0) remain = 0;
-
         const h = Math.floor(remain / 3600);
         const m = Math.floor((remain % 3600) / 60);
         const s = remain % 60;
-
         liveCountdown.innerText = `⏳ 倒數：${String(h).padStart(2, '0')} 小時 ${String(m).padStart(2, '0')} 分 ${String(s).padStart(2, '0')} 秒`;
       }
-
       updateLiveCountdown();
       countdownTimer = setInterval(updateLiveCountdown, 1000);
     }
   </script>
 </body>
 </html>
-
