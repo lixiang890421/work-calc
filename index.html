@@ -1,207 +1,172 @@
-<!DOCTYPE html>
-<html lang="zh-Hant">
-
+<!DOCTYPE html> <!-- 定義 HTML5 文件 -->
+<html lang="zh-Hant"> <!-- 設定語系為繁體中文 -->
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>社畜下班計算器</title>
+  <meta charset="UTF-8" /> <!-- 設定編碼為 UTF-8 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" /> <!-- 手機裝置適配 -->
+  <title>社畜短暫脫離計算器V2.0</title> <!-- 標題列名稱 -->
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: linear-gradient(to bottom right, #f8f9fa, #dce3e8);
-      font-family: 'DFKai-SB', '標楷體', serif;
-      box-sizing: border-box;
+    body { /* 整體網頁背景與字型排版設定 */
+      display: flex; /* 使用 flex 排版 */
+      flex-direction: column; /* 垂直排列 */
+      align-items: center; /* 水平置中 */
+      justify-content: center; /* 垂直置中 */
+      height: 100vh; /* 滿版高 */
+      font-family: 'DFKai-SB', '標楷體', serif; /* 字型 */
+      margin: 0; /* 無邊距 */
+      padding: 1rem; /* 邊內距 */
+      background: #f5f5f5; /* 背景顏色 */
     }
-
-    .container {
-      background: white;
-      border-radius: 1rem;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-      padding: 2rem;
-      width: 90%;
-      max-width: 520px;
-      text-align: center;
-      border: 1px solid #ddd;
+    .container { /* 白色卡片區塊 */
+      background: #fff; /* 背景白色 */
+      padding: 2rem; /* 內距 */
+      border-radius: 0.75rem; /* 圓角 */
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* 陰影 */
+      width: 100%; /* 滿版寬度 */
+      max-width: 440px; /* 最大寬度 */
+      text-align: center; /* 文字置中 */
     }
-
-    .stamp {
-      display: inline-block;
-      border: 2px solid #e57373;
-      color: #e57373;
-      padding: 0.25em 1em;
-      font-size: 1.4rem;
-      font-weight: bold;
-      border-radius: 0.5rem;
-      margin-bottom: 1.5rem;
-      background: #fff5f5;
+    .stamp { /* 浮水印樣式 */
+      display: inline-block; /* 行內區塊 */
+      border: 2px solid #e57373; /* 紅色邊框 */
+      color: #e57373; /* 紅色文字 */
+      padding: 0.25em 1em; /* 內距 */
+      font-size: 1.5rem; /* 字型大小 */
+      margin-bottom: 1rem; /* 下距 */
+      font-weight: bold; /* 粗體 */
+      border-radius: 0.25rem; /* 圓角 */
     }
-
-    h1 {
-      font-size: 1.8rem;
-      margin-bottom: 0.5rem;
+    h1 { /* 主標題樣式 */
+      font-size: 1.5rem; /* 字體大小 */
+      margin: 1rem 0 0.5rem; /* 上下邊距 */
     }
-
-    .time-now {
-      font-size: 1rem;
-      color: #555;
-      margin-bottom: 1rem;
+    .time-now { /* 顯示現在時間 */
+      font-size: 1rem; /* 字體大小 */
+      color: #555; /* 字體顏色 */
+      margin-bottom: 0.5rem; /* 下邊距 */
     }
-
-    .select-group {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
+    .select-group { /* 時間選擇器區塊 */
+      display: flex; /* 水平排列 */
+      justify-content: center; /* 置中 */
+      margin-bottom: 1rem; /* 下邊距 */
     }
-
-    select {
-      font-size: 1.2rem;
-      padding: 0.5rem;
-      border-radius: 0.3rem;
-      border: 1px solid #ccc;
+    select { /* 下拉式選單 */
+      font-size: 1.2rem; /* 字體大小 */
+      padding: 0.5rem; /* 內距 */
+      margin: 0 0.5rem; /* 左右距 */
+      border-radius: 0.25rem; /* 圓角 */
+      border: 1px solid #ccc; /* 邊框顏色 */
     }
-
-    button {
-      width: 100%;
-      padding: 0.8rem;
-      font-size: 1.1rem;
-      background: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 0.4rem;
-      cursor: pointer;
+    button { /* 按鈕樣式 */
+      width: 100%; /* 滿版 */
+      padding: 0.75rem; /* 內距 */
+      font-size: 1rem; /* 字體大小 */
+      border: none; /* 無邊框 */
+      border-radius: 0.25rem; /* 圓角 */
+      background: #4CAF50; /* 背景色 */
+      color: white; /* 字體顏色 */
+      cursor: pointer; /* 滑鼠樣式 */
     }
-
-    button:hover {
-      background: #45A049;
-    }
-
-    .result {
-      margin-top: 1.5rem;
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: #333;
-      white-space: pre-line;
+    button:hover { background: #45A049; } /* 滑鼠懸停變色 */
+    .result { /* 結果顯示區 */
+      margin-top: 1.2rem; /* 上邊距 */
+      text-align: center; /* 置中 */
+      font-size: 1.3rem; /* 字體大小 */
+      font-weight: bold; /* 粗體 */
+      white-space: pre-line; /* 換行保留 */
     }
   </style>
 </head>
-
 <body>
-  <div class="container">
-    <p><a href="leave.html" style="color: #4CAF50; text-decoration: none;">🏖️ 我要請假 (切換到請假神器)</a></p>
-    <div class="stamp" id="day-tip">載入中...</div>
-    <h1>社畜短暫脫離計算器</h1>
-    <div class="time-now" id="time-now">現在時間：--:--</div>
-    <div class="select-group">
-      <select id="hour"></select>
-      <select id="minute"></select>
+  <div class="container"> <!-- 包裹主體內容 -->
+    <div class="stamp">每天都會有好事發生(⁠＾⁠∇⁠＾⁠)⁠ﾉ⁠♪</div> <!-- 浮水印文字 -->
+    <h1>社畜短暫脫離計算器</h1> <!-- 主標題 -->
+    <div class="time-now" id="time-now">—</div> <!-- 顯示現在時間 -->
+    <div class="select-group"> <!-- 選擇上班時間區塊 -->
+      <select id="hour"></select> <!-- 小時選擇 -->
+      <select id="minute"></select> <!-- 分鐘選擇 -->
     </div>
-    <button id="calc-btn">計算下班時間</button>
-    <div class="result" id="result">—</div>
+    <button id="calc-btn">計算下班時間</button> <!-- 執行按鈕 -->
+    <div class="result" id="result">—</div> <!-- 顯示結果 -->
   </div>
 
   <script>
-    const hourSel = document.getElementById('hour');
-    const minSel = document.getElementById('minute');
-    const result = document.getElementById('result');
-    const timeNow = document.getElementById('time-now');
-    const calcBtn = document.getElementById('calc-btn');
-    const dayTip = document.getElementById('day-tip');
+    const hourSel = document.getElementById('hour'); // 取得小時下拉選單
+    const minSel = document.getElementById('minute'); // 取得分鐘下拉選單
+    const result = document.getElementById('result'); // 結果顯示元件
+    const timeNow = document.getElementById('time-now'); // 現在時間顯示元件
+    const calcBtn = document.getElementById('calc-btn'); // 按鈕元件
 
-    // 初始化選單
-    [7, 8].forEach(h => {
-      hourSel.add(new Option(String(h).padStart(2, '0'), h));
-    });
-    for (let m = 0; m < 60; m++) {
-      minSel.add(new Option(String(m).padStart(2, '0'), m));
-    }
-    
-    // 預設值
-    hourSel.value = '7';
-    minSel.value = '30';
+    [7, 8].forEach(h => hourSel.add(new Option(String(h).padStart(2, '0'), h))); // 加入 07、08 小時選項
+    for (let m = 0; m < 60; m++) minSel.add(new Option(String(m).padStart(2, '0'), m)); // 加入 00~59 分鐘選項
+    hourSel.value = '7'; // 預設小時為 7
+    minSel.value = '30'; // 預設分鐘為 30
 
-    function getTaiwanNow() {
-      const local = new Date();
-      const offset = local.getTimezoneOffset();
-      return offset === -480 ? local : new Date(local.getTime() + (480 + offset) * 60000);
+    function getTaiwanNow() { // 取得台灣當前時間
+      const local = new Date(); // 當前時間
+      const offset = local.getTimezoneOffset(); // 與 UTC 的時差
+      return offset === -480 ? local : new Date(local.getTime() + (480 + offset) * 60000); // 修正為 UTC+8
     }
 
-    function updateNowDisplay() {
-      const now = getTaiwanNow();
-      const hh = String(now.getHours()).padStart(2, '0');
-      const mm = String(now.getMinutes()).padStart(2, '0');
-      timeNow.textContent = `現在時間：${hh}:${mm}`;
-      
-      // 動態更新星期提醒
-      const days = ['日', '一', '二', '三', '四', '五', '六'];
-      const dayNum = now.getDay();
-      dayTip.textContent = dayNum === 5 ? "今天是星期五晚上!!" : `今天是週${days[dayNum]}，加油！`;
+    function updateNowDisplay() { // 更新現在時間畫面
+      const now = getTaiwanNow(); // 取得時間
+      const hh = String(now.getHours()).padStart(2, '0'); // 小時轉字串
+      const mm = String(now.getMinutes()).padStart(2, '0'); // 分鐘轉字串
+      timeNow.textContent = `現在時間：${hh}:${mm}`; // 顯示
     }
 
-    // 將計算邏輯包裝成一個可重複呼叫的 function
-    function doCalculate() {
-      updateNowDisplay();
-      const h = +hourSel.value;
-      const m = +minSel.value;
-      const now = getTaiwanNow();
-      let start = new Date(now);
-      start.setHours(h, m, 0, 0);
-      
-      if (start - now > 3600000) start.setDate(start.getDate() - 1);
+    calcBtn.addEventListener('click', () => { // 綁定按鈕點擊
+      updateNowDisplay(); // 更新現在時間
 
-      let end;
-      let remark = '';
-      let color = '#333';
+      const h = +hourSel.value, m = +minSel.value; // 將輸入轉成數字
+      const now = getTaiwanNow(); // 現在時間
+      let start = new Date(now); // 建立開始時間
+      start.setHours(h, m, 0, 0); // 設定為選取時間
+      if (start - now > 3600000) start.setDate(start.getDate() - 1); // 避免時間跨日錯誤
 
-      if (h < 7 || (h === 7 && m < 30)) {
+      let end; // 下班時間
+      let remark = ''; // 顯示備註
+      let color = '#333'; // 字體顏色
+
+      if (h < 7 || (h === 7 && m < 30)) { // 太早到
         end = new Date(start);
         end.setHours(17, 0, 0, 0);
-        remark = '你太早到囉～有睡飽嗎？下班還是17:00喔';
+        remark = '你太早到囉~有睡飽嗎?下班時間一樣是17:00喔!';
         color = '#d32f2f';
-      } else if (h > 8 || (h === 8 && m > 30)) {
+      } else if (h > 8 || (h === 8 && m > 30)) { // 遲到
         end = new Date(start);
         end.setHours(17, 30, 0, 0);
-        remark = '你遲到啦～該請休了，下班 17:30';
+        remark = '你遲到囉，該請休囉~下班時間一樣是17:30喔!';
         color = '#d32f2f';
-      } else if (h === 8 && [29, 30].includes(m)) {
+      } else if (h === 8 && [29, 30].includes(m)) { // 壓線
         end = new Date(start);
         end.setHours(18, 0, 0, 0);
-        remark = '壓線仔！18:00準時下班';
+        remark = '壓線仔!18:00準時下班';
         color = '#d32f2f';
-      } else {
+      } else if (h === 7 && m <= 30) { // 正常早班
+        end = new Date(start);
+        end.setHours(17, 0, 0, 0);
+      } else if (h === 8 && m >= 30) { // 正常晚班
+        end = new Date(start);
+        end.setHours(18, 0, 0, 0);
+      } else { // 其他情況
         end = new Date(start.getTime() + 9.5 * 3600000);
       }
 
-      const diffMin = Math.round((end - now) / 60000);
-      const sign = diffMin >= 0 ? 1 : -1;
-      const absMin = Math.abs(diffMin);
-      const diffH = Math.floor(absMin / 60);
-      const diffM = absMin % 60;
-      const endStr = end.toTimeString().slice(0, 5);
+      const diffMin = Math.round((end - now) / 60000); // 差值分鐘數
+      const sign = diffMin >= 0 ? 1 : -1; // 正或負
+      const absMin = Math.abs(diffMin); // 絕對值
+      const diffH = Math.floor(absMin / 60); // 小時差
+      const diffM = absMin % 60; // 分鐘差
+      const endStr = end.toTimeString().slice(0, 5); // 顯示 HH:mm
 
-      result.style.color = color;
+      result.style.color = color; // 設定字體顏色
       result.textContent = `${remark ? `📌 ${remark}\n` : ''}` +
         (sign > 0
           ? `✅ 下班時間：${endStr}\n⏳ 還剩 ${diffH} 小時 ${diffM} 分鐘`
           : `✅ 你可以下班啦！（已超過 ${diffH} 小時 ${diffM} 分鐘）`);
-    }
+    });
 
-    // 綁定按鈕點擊事件
-    calcBtn.addEventListener('click', doCalculate);
-
-    // 【新增】網頁一打開就自動計算一次
-    window.onload = function() {
-      doCalculate();
-      // 每分鐘自動更新一次時間與結果
-      setInterval(doCalculate, 60000);
-    };
+    updateNowDisplay(); // 頁面初次載入時顯示現在時間
   </script>
 </body>
-
 </html>
