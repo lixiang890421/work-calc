@@ -19,8 +19,8 @@
     }
 
     .container {
-      width: 95%; /* 增加手機版佔比 */
-      max-width: 450px; /* 限制電腦版寬度，避免拉得太扁 */
+      width: 95%; 
+      max-width: 450px; 
       background: white;
       padding: 2.5rem 1rem;
       border-radius: 15px;
@@ -29,7 +29,6 @@
       box-sizing: border-box;
     }
 
-    /* 頂部連結導航 */
     .top-nav {
       margin-bottom: 25px;
       font-size: 1rem;
@@ -44,11 +43,11 @@
 
     .stamp {
       display: inline-block;
-      border: 3px solid #e57373; /* 加粗邊框 */
+      border: 3px solid #e57373; 
       color: #e57373;
       padding: 0.5rem 1.5rem;
       font-size: 1.6rem;
-      font-weight: 900; /* 加粗字體 */
+      font-weight: 900; 
       border-radius: 0.8rem;
       background: #fff5f5;
       margin-bottom: 1.5rem;
@@ -71,7 +70,6 @@
       margin-bottom: 10px;
     }
 
-    /* 表單區域優化 */
     .form-group {
       margin: 25px 0;
       text-align: center;
@@ -84,7 +82,6 @@
       margin-bottom: 8px;
     }
 
-    /* 姓名輸入框風格保持一致 */
     input[type="text"] {
       width: 85%;
       padding: 12px;
@@ -144,7 +141,6 @@
       margin-top: 15px;
     }
 
-    /* 新增回報文字區域樣式 */
     #reportSection {
       display: none;
       margin-top: 25px;
@@ -193,7 +189,7 @@
     <div id="clock">--:--:--</div>
     
     <div class="form-group">
-      <label for="userName">👤 您的姓名（非必填）</label>
+      <label for="userName">👤 您的姓名</label>
       <input type="text" id="userName" placeholder="請在此輸入姓名">
 
       <label for="checkin">⏰ 上班時間</label>
@@ -219,7 +215,6 @@
   </div>
 
   <script>
-    /* 原有逻辑完全保留 */
     const checkinSelect = document.getElementById("checkin");
     for (let h = 7; h <= 8; h++) {
       for (let m = 0; m < 60; m++) {
@@ -294,9 +289,30 @@
       const leaveTime = minutesToTimeStr(current);
       resultDiv.innerHTML = `✅ 最早可下班時間為：<br><span style="font-size:1.8rem; color:#d32f2f;">${leaveTime}</span>`;
 
-      // 顯示並生成回報內容
+      // --- 【核心修改：公務請假邏輯】 ---
+      // 1. 先算出法定最晚下班時間 (如果不請假，該幾點走)
+      let normalWorked = 0;
+      let normalEnd = checkin;
+      while (normalWorked < 480) {
+        if (normalEnd >= lunchStart && normalEnd < lunchEnd) normalEnd = lunchEnd;
+        else { normalEnd++; normalWorked++; }
+      }
+
+      // 2. 回推請假起始點：法定下班時間 - 請假時數
+      let rawStartMin = normalEnd - (leaveHours * 60);
+      
+      // 3. 自動修正為「半點」或「整點」（往回找最接近的 00分 或 30分）
+      // 例如 16:55 會變成 16:30；16:15 會變成 16:00
+      let leaveStartMin = Math.floor(rawStartMin / 30) * 30;
+      const leaveStartTime = minutesToTimeStr(leaveStartMin);
+
       reportSection.style.display = "block";
-      reportContent.innerText = `科長、專員好：${name}今日請休${leaveHours}小時，謝謝。`;
+      if (leaveHours > 0) {
+        reportContent.innerText = `科長、專員好：${name}於${leaveStartTime}請休${leaveHours}小時，謝謝。`;
+      } else {
+        reportContent.innerText = `科長、專員好：${name}今日預計於${leaveTime}準時下班，謝謝。`;
+      }
+      // -------------------------------
 
       function updateLiveCountdown() {
         const now = new Date();
@@ -321,7 +337,6 @@
       countdownTimer = setInterval(updateLiveCountdown, 1000);
     }
 
-    // 複製文字功能
     function copyText() {
       const text = document.getElementById("reportContent").innerText;
       navigator.clipboard.writeText(text).then(() => {
@@ -337,4 +352,3 @@
   </script>
 </body>
 </html>
-
