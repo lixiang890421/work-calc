@@ -4,126 +4,131 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>請假神器</title>
- <style>
-  /* 【整體佈局】優化：確保在小螢幕時可以垂直捲動 */
-  html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    min-height: 100vh; /* 改用最小高度，確保內容多時可捲動 */
-    background: #f0f0f0;
-    font-family: "標楷體", "DFKai-SB", serif;
-    display: flex;
-    justify-content: center;
-    align-items: center; /* 內容少時垂直居中 */
-    overflow-x: hidden; /* 防止左右晃動 */
-  }
+  <style>
+    /* 【CSS 調整指南】 --------------------------------------------------
+       1. 想改背景顏色：修改 body 的 background 色碼。
+       2. 想改卡片寬度：修改 .container 的 max-width（目前是 450px）。
+       3. 想改印章顏色：修改 .stamp 的 border 和 color 色碼。
+    ------------------------------------------------------------------- */
 
-  /* 【容器】優化：移除固定高度，讓內容決定高度 */
-  .container {
-    width: 92%; 
-    max-width: 450px; 
-    margin: 20px auto; /* 增加上下邊距，防止貼邊 */
-    background: white;
-    padding: 2rem 1.2rem;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    text-align: center;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column; /* 讓內部元素垂直排列 */
-    height: auto; /* 關鍵：高度自動 */
-  }
+    /* 設定網頁最底層佈局 */
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100vh; /* 確保背景至少跟螢幕一樣高 */
+      background: #f0f0f0; /* 背景淺灰色 */
+      font-family: "標楷體", "DFKai-SB", serif; /* 使用標楷體 */
+      display: flex;
+      justify-content: center; /* 水平居中 */
+      align-items: flex-start; /* 改為頂部對齊，防止小視窗內容被切掉 */
+      overflow-y: auto; /* 當內容太長時允許垂直捲動 */
+    }
 
-  /* 【頂部連結】優化：防止文字過長被切掉 */
-  .top-nav {
-    margin-bottom: 20px;
-    font-size: 1rem;
-    line-height: 1.4;
-    word-break: break-all; /* 防止長文字爆開 */
-  }
+    /* 白色卡片容器 */
+    .container {
+      width: 95%; 
+      max-width: 450px; 
+      margin: 20px 0; /* 增加上下邊距，確保在小視窗不貼邊 */
+      background: white;
+      padding: 2rem 1.2rem;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      text-align: center;
+      box-sizing: border-box; /* 確保內距不撐開寬度 */
+    }
 
-  .stamp {
-    display: inline-block;
-    border: 3px solid #e57373;
-    color: #e57373;
-    padding: 0.5rem 1rem;
-    font-size: 1.4rem;
-    font-weight: 900;
-    border-radius: 0.8rem;
-    background: #fff5f5;
-    margin-bottom: 1rem;
-  }
+    /* 頂部連結導航 */
+    .top-nav { margin-bottom: 25px; font-size: 1rem; }
+    .top-nav a { color: #555; text-decoration: none; font-weight: bold; border-bottom: 1px solid #ddd; }
 
-  h1 {
-    color: #333;
-    margin: 5px 0 15px 0;
-    font-size: 2rem;
-  }
+    /* 紅色印章 */
+    .stamp {
+      display: inline-block;
+      border: 3px solid #e57373;
+      color: #e57373;
+      padding: 0.5rem 1.5rem;
+      font-size: 1.6rem;
+      font-weight: 900;
+      border-radius: 0.8rem;
+      background: #fff5f5;
+      margin-bottom: 1.5rem;
+    }
 
-  /* 【輸入框與選單】優化：寬度設為 100% 避免溢出容器 */
-  input[type="text"], select {
-    width: 100%; 
-    max-width: 350px;
-    padding: 12px;
-    font-size: 1.1rem;
-    margin-bottom: 15px;
-    border-radius: 10px;
-    border: 2px solid #eee;
-    box-sizing: border-box; /* 確保內距不撐開寬度 */
-    font-family: inherit;
-    text-align: center;
-  }
+    /* 主標題 */
+    h1 { color: #333; margin: 10px 0 20px 0; font-size: 2.2rem; font-weight: bold; }
 
-  button {
-    width: 100%;
-    max-width: 350px;
-    padding: 15px;
-    font-size: 1.2rem;
-    background: #e57373;
-    color: white;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    font-weight: bold;
-    font-family: inherit;
-    box-shadow: 0 4px 10px rgba(229, 115, 115, 0.3);
-    margin-top: 10px;
-  }
+    /* 目前時間時鐘 */
+    #clock {
+      color: #444; font-family: 'Courier New', monospace; font-size: 1.3rem;
+      background: #f9f9f9; padding: 5px; border-radius: 5px; margin-bottom: 10px;
+    }
 
-  /* 【結果區域】優化：自動撐開容器高度 */
-  #result, #countdown, #liveCountdown {
-    margin-top: 15px;
-    font-weight: bold;
-    font-size: 1.1rem;
-    word-wrap: break-word; /* 確保長數字會換行 */
-  }
+    /* 表單區塊排列 */
+    .form-group { margin: 25px 0; text-align: center; }
+    label { font-size: 1.1rem; font-weight: bold; display: block; margin-bottom: 8px; }
 
-  #reportSection {
-    display: none;
-    margin-top: 20px;
-    padding: 12px;
-    background: #fff9f9;
-    border: 1px dashed #e57373;
-    border-radius: 10px;
-    text-align: left;
-  }
-</style>
+    /* 輸入框與下拉選單 */
+    input[type="text"], select {
+      width: 100%; /* 寬度設為 100% 適應容器 */
+      max-width: 350px;
+      padding: 12px;
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      border: 2px solid #eee;
+      box-sizing: border-box;
+      font-family: inherit;
+      text-align: center;
+    }
+
+    /* 按鈕樣式 */
+    button {
+      width: 100%;
+      max-width: 350px;
+      padding: 15px;
+      font-size: 1.3rem;
+      background: #e57373;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      font-family: inherit;
+      box-shadow: 0 4px 10px rgba(229, 115, 115, 0.3);
+      transition: all 0.2s;
+    }
+    button:active { transform: scale(0.98); }
+
+    /* 結果顯示區 */
+    #result, #countdown, #liveCountdown { margin-top: 20px; font-weight: bold; font-size: 1.2rem; line-height: 1.6; }
+    #liveCountdown { color: #d32f2f; background: #fff0f0; padding: 10px; border-radius: 8px; display: inline-block; margin-top: 15px; }
+
+    /* 回報文字區塊 */
+    #reportSection {
+      display: none; /* 初始隱藏 */
+      margin-top: 25px;
+      padding: 15px;
+      background: #fff9f9;
+      border: 1px dashed #e57373;
+      border-radius: 10px;
+      text-align: left;
+    }
+    .report-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .report-title { color: #e57373; font-weight: bold; font-size: 1rem; }
+    .copy-btn { width: auto; padding: 5px 12px; font-size: 0.9rem; background: #666; margin: 0; }
+    #reportContent { font-size: 1.1rem; line-height: 1.6; color: #333; }
+  </style>
 </head>
 <body>
   <div class="container">
-    <div class="top-nav">
-      <a href="calc.html">🏠 回到下班計算器 (沒假啦!)</a>
-    </div>
-
-    <div class="stamp">2026請假請起來</div>
-
+    <div class="top-nav"><a href="calc.html">🏠 回到下班計算器 (沒假啦!)</a></div>
+    <div class="stamp">請假請起來</div>
     <h1>請假神器</h1>
-    
     <div id="clock">--:--:--</div>
     
     <div class="form-group">
-      <label for="userName">👤 您的姓名（非必填）</label>
+      <label for="userName">👤 您的姓名</label>
       <input type="text" id="userName" placeholder="請在此輸入姓名">
 
       <label for="checkin">⏰ 上班時間</label>
@@ -149,24 +154,29 @@
   </div>
 
   <script>
+    /* 【JavaScript 調整指南】 --------------------------------------------
+       1. 想改午休時間：修改 lunchStart (12:00) 與 lunchEnd (13:30)。
+       2. 想改回報格式：在 calculateLeaveTime 底部修改 reportContent.innerText。
+    ------------------------------------------------------------------- */
+
+    // 初始化時間選單 (07:30 - 08:30)
     const checkinSelect = document.getElementById("checkin");
     for (let h = 7; h <= 8; h++) {
       for (let m = 0; m < 60; m++) {
         if ((h === 7 && m < 30) || (h === 8 && m > 30)) continue;
         const val = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
         const option = document.createElement("option");
-        option.value = val;
-        option.text = val;
+        option.value = val; option.text = val;
         if (val === "07:30") option.selected = true;
         checkinSelect.appendChild(option);
       }
     }
 
+    // 初始化時數選單 (0 - 8 小時)
     const leaveSelect = document.getElementById("leaveHours");
     for (let i = 0; i <= 8; i++) {
       const opt = document.createElement("option");
-      opt.value = i;
-      opt.text = `${i} 小時`;
+      opt.value = i; opt.text = `${i} 小時`;
       leaveSelect.appendChild(opt);
     }
 
@@ -181,6 +191,7 @@
       return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
     }
 
+    // 即時更新畫面的時鐘
     function updateClock() {
       const now = new Date();
       const hh = String(now.getHours()).padStart(2, "0");
@@ -193,11 +204,13 @@
 
     let countdownTimer;
 
+    // 核心計算功能
     function calculateLeaveTime() {
-      if(countdownTimer) clearInterval(countdownTimer);
+      if(countdownTimer) clearInterval(countdownTimer); // 重置倒數
       const name = document.getElementById("userName").value || "○○";
       const checkinStr = document.getElementById("checkin").value;
       const leaveHours = parseInt(document.getElementById("leaveHours").value);
+      
       const resultDiv = document.getElementById("result");
       const countdownDiv = document.getElementById("countdown");
       const liveCountdown = document.getElementById("liveCountdown");
@@ -205,12 +218,14 @@
       const reportContent = document.getElementById("reportContent");
 
       const checkin = parseTimeToMinutes(checkinStr);
-      const requiredWork = 480 - (leaveHours * 60);
+      const requiredWork = 480 - (leaveHours * 60); // 應上班總分鐘數
       const lunchStart = parseTimeToMinutes("12:00");
       const lunchEnd = parseTimeToMinutes("13:30");
 
       let worked = 0;
       let current = checkin;
+
+      // 模擬時間計算出下班點
       while (worked < requiredWork) {
         if (current >= lunchStart && current < lunchEnd) {
           current = lunchEnd;
@@ -223,31 +238,29 @@
       const leaveTime = minutesToTimeStr(current);
       resultDiv.innerHTML = `✅ 最早可下班時間為：<br><span style="font-size:1.8rem; color:#d32f2f;">${leaveTime}</span>`;
 
-      // --- 【核心修改：公務請假邏輯】 ---
-      // 1. 先算出法定最晚下班時間 (如果不請假，該幾點走)
-      let normalWorked = 0;
-      let normalEnd = checkin;
+      // 1. 計算原始法定下班時間，用來回推起始點
+      let normalWorked = 0; let normalEnd = checkin;
       while (normalWorked < 480) {
         if (normalEnd >= lunchStart && normalEnd < lunchEnd) normalEnd = lunchEnd;
         else { normalEnd++; normalWorked++; }
       }
 
-      // 2. 回推請假起始點：法定下班時間 - 請假時數
+      // 2. 回推請假起始點 (法定下班時間 - 請假時數)
       let rawStartMin = normalEnd - (leaveHours * 60);
       
-      // 3. 自動修正為「半點」或「整點」（往回找最接近的 00分 或 30分）
-      // 例如 16:55 會變成 16:30；16:15 會變成 16:00
+      // 3. 自動校正為最接近的半點或整點 (例如 16:55 -> 16:30)
       let leaveStartMin = Math.floor(rawStartMin / 30) * 30;
       const leaveStartTime = minutesToTimeStr(leaveStartMin);
 
+      // 4. 顯示回報文字
       reportSection.style.display = "block";
       if (leaveHours > 0) {
-        reportContent.innerText = `科長、專員好：${name}今日${leaveStartTime}請休${leaveHours}小時，謝謝。`;
+        reportContent.innerText = `科長、專員好：${name}於${leaveStartTime}請休${leaveHours}小時，謝謝。`;
       } else {
         reportContent.innerText = `科長、專員好：${name}今日預計於${leaveTime}準時下班，謝謝。`;
       }
-      // -------------------------------
 
+      // 更新倒數計時功能
       function updateLiveCountdown() {
         const now = new Date();
         const nowSeconds = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
@@ -271,6 +284,7 @@
       countdownTimer = setInterval(updateLiveCountdown, 1000);
     }
 
+    // 複製到剪貼簿功能
     function copyText() {
       const text = document.getElementById("reportContent").innerText;
       navigator.clipboard.writeText(text).then(() => {
@@ -280,11 +294,4 @@
         setTimeout(() => {
           btn.innerText = "點擊複製";
           btn.style.background = "#666";
-        }, 2000);
-      });
-    }
-  </script>
-</body>
-</html>
-
-
+        }
