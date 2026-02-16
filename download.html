@@ -12,8 +12,14 @@
     .panel{ width: min(820px, 94vw); border: 1px solid rgba(0,255,0,0.45); background: rgba(0, 12, 0, 0.55); box-shadow: 0 0 26px rgba(0,255,0,0.14); padding: 18px 18px 16px; backdrop-filter: blur(6px); }
 
     .topbar{ display:flex; align-items:center; justify-content:space-between; gap: 12px; margin-bottom: 15px; }
-    .title{ font-size: 1.1rem; letter-spacing: 4px; color: #e8ffe8; text-shadow: 0 0 12px rgba(0,255,0,0.35); }
-    .badge{ font-size: .85rem; padding: 6px 10px; border: 1px solid rgba(0,255,0,0.35); color: rgba(0,255,0,0.85); background: rgba(0,0,0,0.35); }
+    .title{ 
+      font-size: 1.1rem; 
+      letter-spacing: 4px; 
+      color: #e8ffe8; 
+      text-shadow: 0 0 12px rgba(0,255,0,0.35); 
+      white-space: nowrap; /* 確保手機版標題不會斷行 */
+    }
+    .badge{ font-size: .85rem; padding: 6px 10px; border: 1px solid rgba(0,255,0,0.35); color: rgba(0,255,0,0.85); background: rgba(0,0,0,0.35); white-space: nowrap; }
 
     .control-group { display: flex; flex-direction: column; gap: 10px; }
     .row-url { display: flex; width: 100%; }
@@ -158,6 +164,7 @@
         return;
       }
 
+      // Ngrok 隧道連線設定
       const NAS_HOST = "kole-superaccurate-louetta.ngrok-free.dev";
       const API_URL = `https://${NAS_HOST}/api/download`;
       
@@ -188,7 +195,8 @@
         document.getElementById("type").value = "audio";
         toggleOptions();
       } else {
-        document.getElementById("url").value = "https://example.com/page-or-stream";
+        // 替換掉原本的假網址，改為測試用的真實 YouTube 影片以防 404 報錯
+        document.getElementById("url").value = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
         document.getElementById("type").value = "video";
         toggleOptions();
       }
