@@ -15,7 +15,6 @@
     .title{ font-size: 1.1rem; letter-spacing: 4px; color: #e8ffe8; text-shadow: 0 0 12px rgba(0,255,0,0.35); }
     .badge{ font-size: .85rem; padding: 6px 10px; border: 1px solid rgba(0,255,0,0.35); color: rgba(0,255,0,0.85); background: rgba(0,0,0,0.35); }
 
-    /* 控制面板排版更新：改為上下兩排 */
     .control-group { display: flex; flex-direction: column; gap: 10px; }
     .row-url { display: flex; width: 100%; }
     .row-settings { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -92,7 +91,7 @@
 
       <div class="hint">
         ✔ 若你貼的是 <b>mp3/mp4 直連</b>：會直接給你下載連結。<br/>
-        ✔ 選擇「無上限最高畫質」時，若原片有 8K 就會抓 8K，請留意 NAS 容量與等待時間。
+        ✔ 若跳出「Visit Site」警告頁面，只需點擊放行一次即可。
       </div>
 
       <div class="result" id="result">狀態：等待輸入…</div>
@@ -132,7 +131,6 @@
       });
     }, 50);
 
-    // 切換影片與音檔專屬選項的顯示狀態
     function toggleOptions() {
       const type = document.getElementById("type").value;
       if (type === "video") {
@@ -149,7 +147,6 @@
     function go(){
       const url = document.getElementById("url").value.trim();
       const type = document.getElementById("type").value;
-      // 取得新增加的畫質/音質參數
       const resolution = document.getElementById("res_select").value;
       const audio_quality = document.getElementById("audio_select").value;
 
@@ -161,23 +158,24 @@
         return;
       }
 
-      // 你的 Ngrok 隧道
       const NAS_HOST = "kole-superaccurate-louetta.ngrok-free.dev";
       const API_URL = `https://${NAS_HOST}/api/download`;
       
       setResult("⏳ 狀態：伺服器正在依照您的畫質/音質設定進行處理，請勿關閉網頁...");
 
-      // 將 resolution 與 audio_quality 一起打包傳給 NAS
       fetch(API_URL, {
         method: "POST",
-        headers: {"Content-Type":"application/json"},
+        headers: {
+            "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "true" // 🛡️ 破解 Ngrok 攔截的通行證咒語
+        },
         body: JSON.stringify({ url, type, resolution, audio_quality })
       })
       .then(r => r.json())
       .then(data => {
         if(!data.ok) throw new Error(data.error || "下載失敗");
         const fullDownloadUrl = `https://${NAS_HOST}${data.download_url}`;
-        setResult(`✅ 狀態：處理完成！<br/>➡️ <a href="${fullDownloadUrl}" target="_blank" rel="noopener">📥 點我將檔案下載至本機裝置</a>`);
+        setResult(`✅ 狀態：處理完成！<br/>➡️ <a href="${fullDownloadUrl}" target="_blank" rel="noopener">📥 點我將檔案下載至本機裝置</a><br/><span style="font-size:0.8rem; color:#888;">(若跳出 Ngrok 警告，請點擊 Visit Site 放行)</span>`);
       })
       .catch(err => {
         setResult(`❌ 狀態：無法連線至下載服務<br/>原因：${err.message}`);
@@ -188,11 +186,11 @@
       if(kind === "direct"){
         document.getElementById("url").value = "https://example.com/sample.mp3";
         document.getElementById("type").value = "audio";
-        toggleOptions(); // 自動切換選單
+        toggleOptions();
       } else {
         document.getElementById("url").value = "https://example.com/page-or-stream";
         document.getElementById("type").value = "video";
-        toggleOptions(); // 自動切換選單
+        toggleOptions();
       }
       setResult("狀態：已填入示例，按『開始處理』即可。");
     }
