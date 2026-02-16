@@ -8,109 +8,42 @@
     body { margin: 0; background: #000; color: #0f0; font-family: 'Courier New', monospace; overflow: hidden; }
     canvas { position: fixed; top: 0; left: 0; z-index: -1; opacity: 0.35; }
 
-    .wrap{
-      position:absolute; inset:0;
-      display:grid; place-items:center;
-      padding: 24px;
-    }
+    .wrap{ position:absolute; inset:0; display:grid; place-items:center; padding: 24px; }
+    .panel{ width: min(820px, 94vw); border: 1px solid rgba(0,255,0,0.45); background: rgba(0, 12, 0, 0.55); box-shadow: 0 0 26px rgba(0,255,0,0.14); padding: 18px 18px 16px; backdrop-filter: blur(6px); }
 
-    .panel{
-      width: min(820px, 94vw);
-      border: 1px solid rgba(0,255,0,0.45);
-      background: rgba(0, 12, 0, 0.55);
-      box-shadow: 0 0 26px rgba(0,255,0,0.14);
-      padding: 18px 18px 16px;
-      backdrop-filter: blur(6px);
-    }
+    .topbar{ display:flex; align-items:center; justify-content:space-between; gap: 12px; margin-bottom: 15px; }
+    .title{ font-size: 1.1rem; letter-spacing: 4px; color: #e8ffe8; text-shadow: 0 0 12px rgba(0,255,0,0.35); }
+    .badge{ font-size: .85rem; padding: 6px 10px; border: 1px solid rgba(0,255,0,0.35); color: rgba(0,255,0,0.85); background: rgba(0,0,0,0.35); }
 
-    .topbar{
-      display:flex; align-items:center; justify-content:space-between;
-      gap: 12px; margin-bottom: 12px;
-    }
-    .title{
-      font-size: 1.1rem;
-      letter-spacing: 4px;
-      color: #e8ffe8;
-      text-shadow: 0 0 12px rgba(0,255,0,0.35);
-    }
-    .badge{
-      font-size: .85rem;
-      padding: 6px 10px;
-      border: 1px solid rgba(0,255,0,0.35);
-      color: rgba(0,255,0,0.85);
-      background: rgba(0,0,0,0.35);
-    }
+    /* 控制面板排版更新：改為上下兩排 */
+    .control-group { display: flex; flex-direction: column; gap: 10px; }
+    .row-url { display: flex; width: 100%; }
+    .row-settings { display: flex; gap: 10px; flex-wrap: wrap; }
+    
+    input, select { padding: 12px; background: rgba(0,0,0,0.6); color: #0f0; border: 1px solid rgba(0,255,0,0.42); outline: none; font-size: 1rem; font-family: 'Courier New', monospace; }
+    input { flex: 1; }
+    select { flex: 1; min-width: 140px; }
 
-    .grid{
-      display:grid;
-      grid-template-columns: 1fr 180px 160px;
-      gap: 10px;
-    }
+    .btn { padding: 12px 14px; border: 1px solid #0f0; background: transparent; color: #0f0; cursor: pointer; font-size: 1rem; transition: .2s; white-space: nowrap; flex: 0 0 auto; }
+    .btn:hover { background: rgba(0,255,0,0.16); box-shadow: 0 0 18px rgba(0,255,0,0.45); }
+    .btn-submit { flex: 0 0 140px; font-weight: bold; background: rgba(0, 50, 0, 0.5); border-color: #0f0; }
 
-    input, select{
-      padding: 12px 12px;
-      background: rgba(0,0,0,0.6);
-      color: #0f0;
-      border: 1px solid rgba(0,255,0,0.42);
-      outline: none;
-      font-size: 1rem;
-      font-family: 'Courier New', monospace;
-    }
+    .subgrid { display:flex; gap:10px; margin-top: 12px; flex-wrap: wrap; }
+    .btn.secondary { border-color: rgba(0,255,0,0.55); color: rgba(0,255,0,0.85); opacity: .9; padding: 10px 14px;}
+    .btn.secondary:hover { opacity: 1; }
 
-    .btn{
-      padding: 12px 14px;
-      border: 1px solid #0f0;
-      background: transparent;
-      color: #0f0;
-      cursor: pointer;
-      font-size: 1rem;
-      transition: .2s;
-      white-space: nowrap;
-    }
-    .btn:hover{ background: rgba(0,255,0,0.16); box-shadow: 0 0 18px rgba(0,255,0,0.45); }
+    .hint { margin-top: 12px; font-size: .92rem; color: rgba(0,255,0,0.72); line-height: 1.5; }
+    .result { margin-top: 12px; padding: 12px; border: 1px dashed rgba(0,255,0,0.35); background: rgba(0,0,0,0.38); color: #fff; line-height: 1.6; min-height: 54px; word-break: break-all; }
+    .result a { color:#00BFFF; text-decoration:none; }
+    .result a:hover { text-decoration:underline; }
 
-    .subgrid{
-      display:flex; gap:10px; margin-top: 10px; flex-wrap: wrap;
-    }
-    .btn.secondary{
-      border-color: rgba(0,255,0,0.55);
-      color: rgba(0,255,0,0.85);
-      opacity: .9;
-    }
-    .btn.secondary:hover{ opacity: 1; }
-
-    .hint{
-      margin-top: 12px;
-      font-size: .92rem;
-      color: rgba(0,255,0,0.72);
-      line-height: 1.5;
-    }
-
-    .result{
-      margin-top: 12px;
-      padding: 12px;
-      border: 1px dashed rgba(0,255,0,0.35);
-      background: rgba(0,0,0,0.38);
-      color: #fff;
-      line-height: 1.6;
-      min-height: 54px;
-      word-break: break-all;
-    }
-    .result a{ color:#00BFFF; text-decoration:none; }
-    .result a:hover{ text-decoration:underline; }
-
-    .footer{
-      margin-top: 10px;
-      display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
-      font-size: .88rem;
-      color: rgba(0,255,0,0.6);
-    }
-    .linklike{ cursor:pointer; }
-    .linklike:hover{ text-decoration: underline; }
+    .footer { margin-top: 10px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; font-size: .88rem; color: rgba(0,255,0,0.6); }
+    .linklike { cursor:pointer; }
+    .linklike:hover { text-decoration: underline; }
 
     @media (max-width: 760px){
-      .grid{ grid-template-columns: 1fr; }
-      .panel{ padding: 16px; }
+      .row-settings { flex-direction: column; }
+      .btn-submit { flex: 1; }
     }
   </style>
 </head>
@@ -124,13 +57,31 @@
         <div class="badge">SECURE CHANNEL</div>
       </div>
 
-      <div class="grid">
-        <input id="url" placeholder="貼上你『有權限/授權』的媒體網址（或直連 mp3/mp4）" />
-        <select id="type">
-          <option value="video">影片 MP4</option>
-          <option value="audio">音檔 MP3</option>
-        </select>
-        <button class="btn" onclick="go()">開始處理</button>
+      <div class="control-group">
+        <div class="row-url">
+          <input id="url" placeholder="貼上媒體網址（或直連 mp3/mp4）" />
+        </div>
+        <div class="row-settings">
+          <select id="type" onchange="toggleOptions()">
+            <option value="video">🎞️ 格式：影片 MP4</option>
+            <option value="audio">🎵 格式：音檔 MP3</option>
+          </select>
+          
+          <select id="res_select">
+            <option value="best">最高畫質 (無上限, 支援8K/4K)</option>
+            <option value="1080">限制 1080p (FHD)</option>
+            <option value="720">限制 720p (HD)</option>
+            <option value="480">限制 480p (SD)</option>
+          </select>
+
+          <select id="audio_select" style="display:none;">
+            <option value="320">無損級 320 kbps</option>
+            <option value="192" selected>高音質 192 kbps</option>
+            <option value="128">標準音質 128 kbps</option>
+          </select>
+
+          <button class="btn btn-submit" onclick="go()">開始處理</button>
+        </div>
       </div>
 
       <div class="subgrid">
@@ -141,14 +92,13 @@
 
       <div class="hint">
         ✔ 若你貼的是 <b>mp3/mp4 直連</b>：會直接給你下載連結。<br/>
-        ✔ 若是一般網址：會嘗試呼叫你的 NAS 下載服務（需要你 NAS 有 API）。<br/>
-        ⚠️ 只做你有權限/授權的內容，避免踩線。
+        ✔ 選擇「無上限最高畫質」時，若原片有 8K 就會抓 8K，請留意 NAS 容量與等待時間。
       </div>
 
       <div class="result" id="result">狀態：等待輸入…</div>
 
       <div class="footer">
-        <div>TIP：你也可以在網址後面帶參數：<span style="opacity:.85">download.html?type=audio&url=...</span></div>
+        <div>TIP：支援動態畫質/音質參數傳遞</div>
         <div class="linklike" onclick="copyLink()">複製本頁連結</div>
       </div>
     </div>
@@ -182,17 +132,26 @@
       });
     }, 50);
 
-    const qs = new URLSearchParams(location.search);
-    const qUrl = qs.get("url") || "";
-    const qType = qs.get("type") || "video";
-    document.getElementById("url").value = qUrl;
-    document.getElementById("type").value = (qType === "audio" ? "audio" : "video");
+    // 切換影片與音檔專屬選項的顯示狀態
+    function toggleOptions() {
+      const type = document.getElementById("type").value;
+      if (type === "video") {
+        document.getElementById("res_select").style.display = "inline-block";
+        document.getElementById("audio_select").style.display = "none";
+      } else {
+        document.getElementById("res_select").style.display = "none";
+        document.getElementById("audio_select").style.display = "inline-block";
+      }
+    }
 
     function setResult(html){ document.getElementById("result").innerHTML = html; }
 
     function go(){
       const url = document.getElementById("url").value.trim();
       const type = document.getElementById("type").value;
+      // 取得新增加的畫質/音質參數
+      const resolution = document.getElementById("res_select").value;
+      const audio_quality = document.getElementById("audio_select").value;
 
       if(!url){ setResult("⚠️ 狀態：請提供有效網址"); return; }
 
@@ -202,23 +161,21 @@
         return;
       }
 
-      // 伺服器位置設定：已切換為 Ngrok 外網穿透隧道
+      // 你的 Ngrok 隧道
       const NAS_HOST = "kole-superaccurate-louetta.ngrok-free.dev";
-      // 確保使用 https 以避開瀏覽器 Mixed Content 阻擋
       const API_URL = `https://${NAS_HOST}/api/download`;
       
-      setResult("⏳ 狀態：伺服器正在處理下載請求，檔案較大時需較長等待時間，請勿關閉網頁...");
+      setResult("⏳ 狀態：伺服器正在依照您的畫質/音質設定進行處理，請勿關閉網頁...");
 
+      // 將 resolution 與 audio_quality 一起打包傳給 NAS
       fetch(API_URL, {
         method: "POST",
         headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({ url, type })
+        body: JSON.stringify({ url, type, resolution, audio_quality })
       })
       .then(r => r.json())
       .then(data => {
         if(!data.ok) throw new Error(data.error || "下載失敗");
-        
-        // 組合完整的對外下載網址，同樣使用 https
         const fullDownloadUrl = `https://${NAS_HOST}${data.download_url}`;
         setResult(`✅ 狀態：處理完成！<br/>➡️ <a href="${fullDownloadUrl}" target="_blank" rel="noopener">📥 點我將檔案下載至本機裝置</a>`);
       })
@@ -229,11 +186,13 @@
 
     function fillExample(kind){
       if(kind === "direct"){
-        document.getElementById("url").value = "https://youtu.be/p7ZsBPK656s?list=PLyjhTeEl5_aowzTy0IdAyIs1784p2kGY8";
+        document.getElementById("url").value = "https://example.com/sample.mp3";
         document.getElementById("type").value = "audio";
+        toggleOptions(); // 自動切換選單
       } else {
-        document.getElementById("url").value = "https://youtu.be/p7ZsBPK656s?list=PLyjhTeEl5_aowzTy0IdAyIs1784p2kGY8";
+        document.getElementById("url").value = "https://example.com/page-or-stream";
         document.getElementById("type").value = "video";
+        toggleOptions(); // 自動切換選單
       }
       setResult("狀態：已填入示例，按『開始處理』即可。");
     }
@@ -246,9 +205,6 @@
         setResult("⚠️ 狀態：瀏覽器不允許複製（可手動複製網址列）");
       }
     }
-
-    if(qUrl) setTimeout(go, 120);
   </script>
 </body>
 </html>
-
