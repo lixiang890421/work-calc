@@ -1,0 +1,252 @@
+<!-- ✅ 新版 download.html：更乾淨、更像系統面板（不醜、主視覺一致） -->
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>社會局 - 媒體下載模組</title>
+  <style>
+    body { margin: 0; background: #000; color: #0f0; font-family: 'Courier New', monospace; overflow: hidden; }
+    canvas { position: fixed; top: 0; left: 0; z-index: -1; opacity: 0.35; }
+
+    .wrap{
+      position:absolute; inset:0;
+      display:grid; place-items:center;
+      padding: 24px;
+    }
+
+    .panel{
+      width: min(820px, 94vw);
+      border: 1px solid rgba(0,255,0,0.45);
+      background: rgba(0, 12, 0, 0.55);
+      box-shadow: 0 0 26px rgba(0,255,0,0.14);
+      padding: 18px 18px 16px;
+      backdrop-filter: blur(6px);
+    }
+
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      gap: 12px; margin-bottom: 12px;
+    }
+    .title{
+      font-size: 1.1rem;
+      letter-spacing: 4px;
+      color: #e8ffe8;
+      text-shadow: 0 0 12px rgba(0,255,0,0.35);
+    }
+    .badge{
+      font-size: .85rem;
+      padding: 6px 10px;
+      border: 1px solid rgba(0,255,0,0.35);
+      color: rgba(0,255,0,0.85);
+      background: rgba(0,0,0,0.35);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 180px 160px;
+      gap: 10px;
+    }
+
+    input, select{
+      padding: 12px 12px;
+      background: rgba(0,0,0,0.6);
+      color: #0f0;
+      border: 1px solid rgba(0,255,0,0.42);
+      outline: none;
+      font-size: 1rem;
+      font-family: 'Courier New', monospace;
+    }
+
+    .btn{
+      padding: 12px 14px;
+      border: 1px solid #0f0;
+      background: transparent;
+      color: #0f0;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: .2s;
+      white-space: nowrap;
+    }
+    .btn:hover{ background: rgba(0,255,0,0.16); box-shadow: 0 0 18px rgba(0,255,0,0.45); }
+
+    .subgrid{
+      display:flex; gap:10px; margin-top: 10px; flex-wrap: wrap;
+    }
+    .btn.secondary{
+      border-color: rgba(0,255,0,0.55);
+      color: rgba(0,255,0,0.85);
+      opacity: .9;
+    }
+    .btn.secondary:hover{ opacity: 1; }
+
+    .hint{
+      margin-top: 12px;
+      font-size: .92rem;
+      color: rgba(0,255,0,0.72);
+      line-height: 1.5;
+    }
+
+    .result{
+      margin-top: 12px;
+      padding: 12px;
+      border: 1px dashed rgba(0,255,0,0.35);
+      background: rgba(0,0,0,0.38);
+      color: #fff;
+      line-height: 1.6;
+      min-height: 54px;
+      word-break: break-all;
+    }
+    .result a{ color:#00BFFF; text-decoration:none; }
+    .result a:hover{ text-decoration:underline; }
+
+    .footer{
+      margin-top: 10px;
+      display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
+      font-size: .88rem;
+      color: rgba(0,255,0,0.6);
+    }
+    .linklike{ cursor:pointer; }
+    .linklike:hover{ text-decoration: underline; }
+
+    @media (max-width: 760px){
+      .grid{ grid-template-columns: 1fr; }
+      .panel{ padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="matrix"></canvas>
+
+  <div class="wrap">
+    <div class="panel">
+      <div class="topbar">
+        <div class="title">【 媒 體 下 載 模 組 】</div>
+        <div class="badge">SECURE CHANNEL</div>
+      </div>
+
+      <div class="grid">
+        <input id="url" placeholder="貼上你『有權限/授權』的媒體網址（或直連 mp3/mp4）" />
+        <select id="type">
+          <option value="video">影片 MP4</option>
+          <option value="audio">音檔 MP3</option>
+        </select>
+        <button class="btn" onclick="go()">開始處理</button>
+      </div>
+
+      <div class="subgrid">
+        <button class="btn secondary" onclick="fillExample('direct')">填入示例：直連</button>
+        <button class="btn secondary" onclick="fillExample('other')">填入示例：一般網址</button>
+        <button class="btn secondary" onclick="history.back()">← 返回上一頁</button>
+      </div>
+
+      <div class="hint">
+        ✔ 若你貼的是 <b>mp3/mp4 直連</b>：會直接給你下載連結。<br/>
+        ✔ 若是一般網址：會嘗試呼叫你的 NAS 下載服務（需要你 NAS 有 API）。<br/>
+        ⚠️ 只做你有權限/授權的內容，避免踩線。
+      </div>
+
+      <div class="result" id="result">狀態：等待輸入…</div>
+
+      <div class="footer">
+        <div>TIP：你也可以在網址後面帶參數：<span style="opacity:.85">download.html?type=audio&url=...</span></div>
+        <div class="linklike" onclick="copyLink()">複製本頁連結</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Matrix 背景（保持你原本風格）
+    const canvas = document.getElementById("matrix");
+    const ctx = canvas.getContext("2d");
+    function resize(){ canvas.width = innerWidth; canvas.height = innerHeight; }
+    resize(); addEventListener("resize", resize);
+
+    const letters = "01010101COMPUTER-IDENTIFIED-ACCESS-DENIED-WELCOME-BACK".split("");
+    const fontSize = 16;
+    function initDrops(){
+      const cols = canvas.width / fontSize;
+      return Array(Math.floor(cols)).fill(1);
+    }
+    let drops = initDrops();
+    addEventListener("resize", () => drops = initDrops());
+
+    setInterval(() => {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.06)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#0f0";
+      ctx.font = fontSize + "px monospace";
+      drops.forEach((y, i) => {
+        const t = letters[Math.floor(Math.random() * letters.length)];
+        ctx.fillText(t, i * fontSize, y * fontSize);
+        if (y * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+        drops[i]++;
+      });
+    }, 50);
+
+    // 參數帶入
+    const qs = new URLSearchParams(location.search);
+    const qUrl = qs.get("url") || "";
+    const qType = qs.get("type") || "video";
+    document.getElementById("url").value = qUrl;
+    document.getElementById("type").value = (qType === "audio" ? "audio" : "video");
+
+    function setResult(html){ document.getElementById("result").innerHTML = html; }
+
+    function go(){
+      const url = document.getElementById("url").value.trim();
+      const type = document.getElementById("type").value;
+
+      if(!url){ setResult("⚠️ 狀態：你沒貼網址啦"); return; }
+
+      // 直連檔案
+      const direct = /\.(mp3|mp4|m4a|wav|flac)(\?.*)?$/i.test(url);
+      if(direct){
+        setResult(`✅ 狀態：直連檔案偵測成功<br/>➡️ <a href="${url}" target="_blank" rel="noopener">點我下載 / 開啟</a>`);
+        return;
+      }
+
+      // NAS API（你要用再架）
+      const API_URL = "http://192.168.0.131:8787/api/download";
+      setResult("⏳ 狀態：已送出任務給 NAS…（若你尚未架 API，會顯示失敗）");
+
+      fetch(API_URL, {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ url, type })
+      })
+      .then(r => r.json())
+      .then(data => {
+        if(!data.ok) throw new Error(data.error || "下載失敗");
+        setResult(`✅ 狀態：完成<br/>➡️ <a href="${data.download_url}" target="_blank" rel="noopener">點我下載</a>`);
+      })
+      .catch(err => {
+        setResult(`❌ 狀態：無法連到 NAS 下載服務<br/>原因：${err.message}<br/><br/>👉 若你只是要「直連下載」，請貼 mp3/mp4 直連網址。`);
+      });
+    }
+
+    function fillExample(kind){
+      if(kind === "direct"){
+        document.getElementById("url").value = "https://example.com/sample.mp3";
+        document.getElementById("type").value = "audio";
+      } else {
+        document.getElementById("url").value = "https://example.com/page-or-stream";
+        document.getElementById("type").value = "video";
+      }
+      setResult("狀態：已填入示例，按『開始處理』即可。");
+    }
+
+    async function copyLink(){
+      try{
+        await navigator.clipboard.writeText(location.href);
+        setResult("✅ 狀態：已複製本頁連結到剪貼簿");
+      }catch(e){
+        setResult("⚠️ 狀態：瀏覽器不允許複製（可手動複製網址列）");
+      }
+    }
+
+    // 有帶參數就自動跑一次
+    if(qUrl) setTimeout(go, 120);
+  </script>
+</body>
+</html>
