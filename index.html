@@ -22,6 +22,70 @@
     button:hover { background: rgba(0,255,0,0.2); box-shadow: 0 0 20px #0f0; }
 
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* ====== 新增：下載模組 UI（不動你原本的 CSS，只在下面加） ====== */
+    .card {
+      width: min(720px, 92vw);
+      margin: 22px auto 0;
+      padding: 18px 16px;
+      border: 1px solid rgba(0,255,0,0.55);
+      background: rgba(0, 20, 0, 0.35);
+      box-shadow: 0 0 18px rgba(0,255,0,0.18);
+      text-align: left;
+    }
+    .card h3 {
+      margin: 0 0 10px;
+      font-size: 1.1rem;
+      letter-spacing: 2px;
+      color: #caffca;
+      text-shadow: 0 0 8px rgba(0,255,0,0.35);
+    }
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .row input, .row select {
+      flex: 1 1 280px;
+      padding: 12px 12px;
+      background: rgba(0,0,0,0.55);
+      color: #0f0;
+      border: 1px solid rgba(0,255,0,0.5);
+      outline: none;
+      font-size: 1rem;
+      font-family: 'Courier New', monospace;
+    }
+    .row select { flex: 0 0 160px; }
+    .row .smallbtn {
+      flex: 0 0 auto;
+      padding: 12px 18px;
+      border: 1px solid #0f0;
+      background: transparent;
+      color: #0f0;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .row .smallbtn:hover {
+      background: rgba(0,255,0,0.2);
+      box-shadow: 0 0 20px #0f0;
+    }
+    .hint {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: rgba(0,255,0,0.75);
+      line-height: 1.4;
+    }
+    .result {
+      margin-top: 10px;
+      font-size: 0.95rem;
+      color: #fff;
+      line-height: 1.4;
+      word-break: break-all;
+    }
+    .result a { color: #00BFFF; text-decoration: none; }
+    .result a:hover { text-decoration: underline; }
+    /* ====== 新增結束 ====== */
   </style>
 </head>
 <body>
@@ -84,24 +148,35 @@
       }
     }, 100);
 
-    function showSuccess() {
-      status.style.color = "#fff";
-      status.innerText = "【 驗 證 成 功 】";
-      subMsg.innerHTML = "<span class='typing'>長官好 ! 歡迎您回歸。系統權限已全面解鎖。</span>";
-      
-      setTimeout(() => {
-        const btns = document.createElement("div");
-        btns.className = "btn-group";
-        btns.style.display = "block";
-        btns.innerHTML = `
-          <button onclick="location.href='calc.html'">⏱️ 進入下班計算系統</button>
-          <button onclick="location.href='leave.html'">🏖️ 啟動請假神器模組</button>
-        `;
+function showSuccess() {
+      status.style.color = "#fff";
+      status.innerText = "【 驗 證 成 功 】";
+      subMsg.innerHTML = "<span class='typing'>長官好 ! 歡迎您回歸。系統權限已全面解鎖。</span>";
+      
+      setTimeout(() => {
+        const btns = document.createElement("div");
+        btns.className = "btn-group";
+        btns.style.display = "block";
+        
+        // 補回被截斷的反引號 (`) 
+        btns.innerHTML = `
+          <button onclick="location.href='calc.html'">⏱️ 進入下班計算系統</button>
+          <button onclick="location.href='leave.html'">🏖️ 啟動請假神器模組</button>
+          <button onclick="location.href='download.html'">⬇️ 媒體下載模組</button>
+        `; 
+        
+        // 補回把按鈕加進畫面的指令
         display.appendChild(btns);
-      }, 1500);
+      }, 1500); // 補回 setTimeout 的結尾
+    } // 補回 function 的結尾
+
+    // 補上 goDownload 的空殼功能，避免按下去網頁報錯
+    function goDownload() {
+      // 這裡看你要怎麼做，目前先用跳出視窗測試
+      alert("準備啟動下載模組...");
+      // 如果你有另外寫一頁下載專用頁，把下面這行最前面的 // 拿掉
+      // location.href = 'download.html'; 
     }
-  </script>
+  </script>
 </body>
 </html>
-
-
