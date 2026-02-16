@@ -202,10 +202,10 @@
         return;
       }
 
-      // 伺服器位置設定
-      // 若要在外部網路使用，請將此處替換為你的 DDNS (例如：yourname.synology.me:8787)
-      const NAS_HOST = "192.168.0.131:8787";
-      const API_URL = `http://${NAS_HOST}/api/download`;
+      // 伺服器位置設定：已切換為 Ngrok 外網穿透隧道
+      const NAS_HOST = "kole-superaccurate-louetta.ngrok-free.dev";
+      // 確保使用 https 以避開瀏覽器 Mixed Content 阻擋
+      const API_URL = `https://${NAS_HOST}/api/download`;
       
       setResult("⏳ 狀態：伺服器正在處理下載請求，檔案較大時需較長等待時間，請勿關閉網頁...");
 
@@ -218,8 +218,8 @@
       .then(data => {
         if(!data.ok) throw new Error(data.error || "下載失敗");
         
-        // 組合完整的對外下載網址
-        const fullDownloadUrl = `http://${NAS_HOST}${data.download_url}`;
+        // 組合完整的對外下載網址，同樣使用 https
+        const fullDownloadUrl = `https://${NAS_HOST}${data.download_url}`;
         setResult(`✅ 狀態：處理完成！<br/>➡️ <a href="${fullDownloadUrl}" target="_blank" rel="noopener">📥 點我將檔案下載至本機裝置</a>`);
       })
       .catch(err => {
