@@ -41,7 +41,7 @@
 
     .footer { margin-top: 10px; display:flex; justify-content:space-between; font-size: .88rem; color: rgba(0,255,0,0.6); }
 
-    /* 📱 手機版專屬修正：徹底解決「超大顆」按鈕問題 */
+    /* 📱 手機版專屬修正 */
     @media (max-width: 760px){
       .wrap { padding: 12px; align-items: flex-start; padding-top: 3vh; position: relative; }
       .topbar { flex-direction: column; align-items: center; text-align: center; }
@@ -50,11 +50,10 @@
       .row-settings { flex-direction: column; width: 100%; }
       select { width: 100%; margin-bottom: 5px; }
       
-      /* 強制修正開始處理按鈕的大小 */
       .btn-submit { 
         width: 100% !important; 
         flex: none !important;
-        height: 50px !important; /* 限制高度，避免變方塊 */
+        height: 50px !important; 
         margin-top: 5px;
         display: block;
       }
@@ -190,8 +189,13 @@
           } else if (task.status === 'processing' || task.status === 'merging') {
             const p = parseFloat(task.progress) || 0;
             const bar = "█".repeat(Math.round(20 * (p / 100))) + "░".repeat(20 - Math.round(20 * (p / 100)));
+            // ⭐ 核心修正：加入 ETA 顯示
             let msg = `📡 進度：[${bar}] ${p}%<br/>`;
-            msg += task.status === 'merging' ? '⚡ 正在合併高畫質資源...' : `🚀 速度：${task.speed || '---'}`;
+            if (task.status === 'merging') {
+                msg += '⚡ 正在封裝資源...';
+            } else {
+                msg += `🚀 現在網路速度：${task.speed || '---'} | ⏱️ 預計剩餘：${task.eta || '---'}`;
+            }
             setResult(msg);
           }
         });
